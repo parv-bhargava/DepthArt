@@ -1,1 +1,1 @@
-# Final-Project-Group
+# DepthArt: From Snapshot to Landscape
