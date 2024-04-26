@@ -22,5 +22,10 @@ mv kaggle.json ~/.kaggle
 kaggle competitions download -c 'image-matching-challenge-2023'
 ```
 
+**Unzip the dataset**
+```bash
+unzip image-matching-challenge-2023.zip
+```
+
 Refrences: [Kaggle Setup](https://www.endtoend.ai/tutorial/how-to-download-kaggle-datasets-on-ubuntu/)
 
