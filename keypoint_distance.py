@@ -4,6 +4,7 @@ import kornia.feature as KF
 from pathlib import Path
 from tqdm import tqdm
 
+print(Path)
 def keypoint_distances(
         paths: list[Path],
         index_pairs: list[tuple[int, int]],
