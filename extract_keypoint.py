@@ -1,5 +1,6 @@
 import h5py
 import torch
+from pathlib import Path
 
 def detect_keypoints(
         paths: list[Path],
