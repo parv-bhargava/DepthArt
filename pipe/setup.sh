@@ -11,7 +11,7 @@ kaggle models instances versions download oldufo/lightglue/pyTorch/aliked/1
 tar -xzf lightglue.tar.gz
 cp aliked_lightglue.pth ~/.cache/torch/hub/checkpoints/aliked_lightglue_v0-1_arxiv.pth
 
-# Download and extract another version of LightGlue model checkpoints
+# Download and extract ALIKED model checkpoints
 kaggle models instances versions download oldufo/aliked/pyTorch/aliked-n16/1
 tar -xzf aliked.tar.gz
 cp aliked-n16.pth ~/.cache/torch/hub/checkpoints/aliked-n16.pth
