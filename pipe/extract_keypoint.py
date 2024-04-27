@@ -1,7 +1,4 @@
-import h5py
-import torch
-from pathlib import Path
-
+from utils import *
 def detect_keypoints(
         paths: list[Path],
         feature_dir: Path,
@@ -23,7 +20,6 @@ def detect_keypoints(
     ).eval().to(device, dtype)
 
     feature_dir.mkdir(parents=True, exist_ok=True)
-
 
     with h5py.File(feature_dir / "keypoints.h5", mode="w") as f_keypoints, \
             h5py.File(feature_dir / "descriptors.h5", mode="w") as f_descriptors:

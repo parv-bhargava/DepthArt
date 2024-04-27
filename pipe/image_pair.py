@@ -1,12 +1,4 @@
-import torch
-from transformers import AutoImageProcessor, AutoModel
-from pathlib import Path
-from tqdm import tqdm
-import torch.nn.functional as F
-import itertools
-import numpy as np
-from typing import Any
-from torch import Tensor as T
+from utils import *
 
 def embed_images(
         paths: list[Path],
