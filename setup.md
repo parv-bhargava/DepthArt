@@ -103,8 +103,8 @@ mkdir -p dinov2/pytorch/base/1
 tar -xzf base.tar.gz -C dinov2/pytorch/base/1
 ```
 
-
 ## Setup Script
+
 Use get_data.sh to download the dataset
 
 ```bash
