@@ -1,4 +1,6 @@
 from utils import *
+
+
 def detect_keypoints(
         paths: list[Path],
         feature_dir: Path,

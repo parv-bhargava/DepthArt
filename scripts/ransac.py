@@ -1,9 +1,10 @@
 from utils import *
 
+
 def import_into_colmap(
-    path: Path,
-    feature_dir: Path,
-    database_path: str = "colmap.db",
+        path: Path,
+        feature_dir: Path,
+        database_path: str = "colmap.db",
 ) -> None:
     """Adds keypoints into colmap"""
     db = COLMAPDatabase.connect(database_path)

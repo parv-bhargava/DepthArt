@@ -1,9 +1,10 @@
-#%%
+# %%
 # Read and viuzulize images from the dataset
 import os
-import numpy as np
+
 import matplotlib.pyplot as plt
 from PIL import Image
+
 
 def read_images(path):
     images = []
@@ -12,6 +13,7 @@ def read_images(path):
         images.append(img)
     return images
 
+
 def plot_images(images):
     # Plot all images
     fig, axes = plt.subplots(1, len(images), figsize=(20, 10))
@@ -19,6 +21,7 @@ def plot_images(images):
         ax.imshow(img)
         ax.axis('off')
     plt.show()
+
 
 category = "heritage"
 object_name = 'wall'

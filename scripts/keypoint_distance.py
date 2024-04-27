@@ -1,5 +1,6 @@
 from utils import *
 
+
 def keypoint_distances(
         paths: list[Path],
         index_pairs: list[tuple[int, int]],

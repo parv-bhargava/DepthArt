@@ -12,10 +12,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import os, argparse, h5py, warnings
+import argparse
+import h5py
+import os
+import warnings
+
 import numpy as np
-from tqdm import tqdm
 from PIL import Image, ExifTags
+from tqdm import tqdm
 
 from database import COLMAPDatabase, image_ids_to_pair_id
 

@@ -1,5 +1,6 @@
 from utils import *
 
+
 def embed_images(
         paths: list[Path],
         model_name: str,
