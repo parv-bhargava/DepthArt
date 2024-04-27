@@ -21,7 +21,7 @@ import numpy as np
 from PIL import Image, ExifTags
 from tqdm import tqdm
 
-from database import COLMAPDatabase, image_ids_to_pair_id
+from scripts.database import COLMAPDatabase, image_ids_to_pair_id
 
 
 def get_focal(image_path, err_on_default=False):

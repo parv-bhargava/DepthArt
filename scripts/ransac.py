@@ -1,4 +1,4 @@
-from utils import *
+from scripts.utils import *
 
 
 def import_into_colmap(
@@ -10,10 +10,11 @@ def import_into_colmap(
     db = COLMAPDatabase.connect(database_path)
     db.create_tables()
     single_camera = False
-    fname_to_id = add_keypoints(db, feature_dir, path, "", "simple-pinhole", single_camera)
+    fname_to_id = add_keypoints(db, feature_dir, path, "", "simple-radial", single_camera)
     add_matches(
         db,
         feature_dir,
         fname_to_id,
     )
     db.commit()
+

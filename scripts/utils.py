@@ -35,8 +35,8 @@ from lightglue.utils import load_image, rbd
 import pycolmap
 
 # Provided by organizers
-from database import *
-from h5_to_db import *
+from scripts.database import *
+from scripts.h5_to_db import *
 
 def arr_to_str(a):
     """Returns ;-separated string representing the input"""

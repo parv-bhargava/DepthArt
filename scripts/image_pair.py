@@ -1,4 +1,4 @@
-from utils import *
+from scripts.utils import *
 
 
 def embed_images(

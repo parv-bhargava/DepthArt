@@ -2,6 +2,7 @@ from scripts.image_pair import get_image_pairs
 from scripts.extract_keypoint import detect_keypoints
 from scripts.keypoint_distance import keypoint_distances
 from scripts.ransac import import_into_colmap
+from scripts.match import visualize_matches
 from pathlib import Path
 import pycolmap
 
@@ -20,6 +21,10 @@ detect_keypoints(images_list, feature_dir)
 
 # Compute Keypoint Distances
 keypoint_distances(images_list, index_pairs, feature_dir, verbose=False)
+
+# Image matching
+idx1,idx2= index_pairs[2]
+visualize_matches(images_list, idx1, idx2, feature_dir)
 
 # Import into Colmap
 database_path = "colmap.db"
