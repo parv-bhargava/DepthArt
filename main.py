@@ -1,23 +1,47 @@
-from torch.utils.data import DataLoader
-from torchvision import transforms
-from data_loader import ImageDataset
-import pandas as pd
+from scripts.image_pair import get_image_pairs
+from scripts.extract_keypoint import detect_keypoints
+from scripts.keypoint_distance import keypoint_distances
+from scripts.ransac import import_into_colmap
 from pathlib import Path
-import os
+import pycolmap
 
-main_path=Path(os.getcwd())
-train_path= main_path / 'train'
-train_labels_path= train_path / 'train_labels.csv'
-train_labels=pd.read_csv(train_labels_path)
-train_labels.head(4)
+PATH = '/home/ubuntu/DepthArt/train/haiper/bike/images'
+EXT = 'jpeg'
+PATH_FEATURES = '/home/ubuntu/DepthArt/features'
+DINO_PATH = '/home/ubuntu/DepthArt/dinov2/pytorch/base/1'
 
-df_train_labels=train_labels.sample(frac=0.9, random_state=42)
-df_val_labels=train_labels.drop(df_train_labels.index)
+# Get Image Pairs
+images_list = list(Path(PATH).glob(f'*.{EXT}'))[:10]
+index_pairs = get_image_pairs(images_list, DINO_PATH) #TODO: Add Dinov2 path
 
-image_transform=transforms.Compose([transforms.Resize(size=(224,224)), transforms.ToTensor()])
-train_dataset = ImageDataset(df_train_labels, image_transform)
-val_dataset = ImageDataset(df_val_labels, image_transform)
+# Extract keypoints
+feature_dir = Path(PATH_FEATURES)
+detect_keypoints(images_list, feature_dir)
 
-train_dataloader=DataLoader(dataset=train_dataset, batch_size=8, shuffle= True)
-val_dataloader=DataLoader(dataset=val_dataset, batch_size=8, shuffle= False)
+# Compute Keypoint Distances
+keypoint_distances(images_list, index_pairs, feature_dir, verbose=False)
+
+# Import into Colmap
+database_path = "colmap.db"
+images_dir = images_list[0].parent
+import_into_colmap(
+    images_dir,
+    feature_dir,
+    database_path,
+)
+
+# This does RANSAC
+pycolmap.match_exhaustive(database_path)
+
+# This does the reconstruction
+mapper_options = pycolmap.IncrementalPipelineOptions()
+mapper_options.min_model_size = 3
+mapper_options.max_num_models = 2
+
+maps = pycolmap.incremental_mapping(
+    database_path=database_path,
+    image_path=images_dir,
+    output_path=Path.cwd() / "incremental_pipeline_outputs",
+    options=mapper_options,
+)
 
