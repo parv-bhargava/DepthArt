@@ -5,11 +5,13 @@ from scripts.ransac import import_into_colmap
 from scripts.match import visualize_matches
 from pathlib import Path
 import pycolmap
+import torch
 
 PATH = '/home/ubuntu/DepthArt/train/haiper/bike/images'
 EXT = 'jpeg'
 PATH_FEATURES = '/home/ubuntu/DepthArt/features'
 DINO_PATH = '/home/ubuntu/DepthArt/dinov2/pytorch/base/1'
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Get Image Pairs
 images_list = list(Path(PATH).glob(f'*.{EXT}'))[:10]
@@ -17,10 +19,10 @@ index_pairs = get_image_pairs(images_list, DINO_PATH) #TODO: Add Dinov2 path
 
 # Extract keypoints
 feature_dir = Path(PATH_FEATURES)
-detect_keypoints(images_list, feature_dir)
+detect_keypoints(images_list, feature_dir, device=device)
 
 # Compute Keypoint Distances
-keypoint_distances(images_list, index_pairs, feature_dir, verbose=False)
+keypoint_distances(images_list, index_pairs, feature_dir, verbose=False, device=device)
 
 # Image matching
 idx1,idx2= index_pairs[2]
