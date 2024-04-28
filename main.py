@@ -6,31 +6,33 @@ from scripts.image_pair import get_image_pairs
 from scripts.keypoint_distance import keypoint_distances
 from scripts.match import visualize_matches
 from scripts.ransac import import_into_colmap
-from scripts.utils import plot_reconstruction
+from scripts.utils import plot_reconstruction,colmap_dense_reconstruction
 
-PATH = '/home/ubuntu/DepthArt/train/phototourism/colosseum_exterior/images'
+PATH = '/home/ubuntu/DepthArt/train/phototourism/taj_mahal/images'
 EXT = 'jpg'
 PATH_FEATURES = '/home/ubuntu/DepthArt/features'
 DINO_PATH = '/home/ubuntu/DepthArt/dinov2/pytorch/base/1'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Get Image Pairs
+# Get Image Pairs for Matching using DINO
 images_list = list(Path(PATH).glob(f'*.{EXT}'))
 index_pairs = get_image_pairs(images_list, DINO_PATH)
 
-# Extract keypoints
+# Extract keypoints using ALIKED
 feature_dir = Path(PATH_FEATURES)
 detect_keypoints(images_list, feature_dir, device=device)
 
-# Compute Keypoint Distances
+# Compute Keypoint Distances  using LightGlue
 keypoint_distances(images_list, index_pairs, feature_dir, verbose=False, device=device)
 
-# Image matching
+# Visualise Image matching
 idx1, idx2 = index_pairs[2]
 visualize_matches(images_list, idx1, idx2, feature_dir)
 
+
+
 # Import into Colmap
-database_path = "colmap_colosseum.db"
+database_path = "colmap_taj.db"
 images_dir = images_list[0].parent
 import_into_colmap(
     images_dir,
@@ -55,5 +57,8 @@ maps = pycolmap.incremental_mapping(
 
 # Visualize the 3D reconstruction
 plot_reconstruction(maps[0], 'Reconstruction_Colosseum_0.html')
-plot_reconstruction(maps[1], 'Reconstruction_Colosseum_1.html')
+
+
+# Dense Reconstruction
+# colmap_dense_reconstruction(images_dir, database_path, Path.cwd())
 

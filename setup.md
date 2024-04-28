@@ -96,7 +96,7 @@ kaggle models instances versions download metaresearch/dinov2/pyTorch/base/1
 ```bash
 mkdir -p dinov2/pytorch/base/1
 ````
-
+``
 **Unzip the model**
 
 ```bash

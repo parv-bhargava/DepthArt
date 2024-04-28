@@ -2,6 +2,10 @@
 import matplotlib.pyplot as plt
 
 import os
+# Set environment variables
+os.environ['PATH'] += ':/usr/local/cuda/bin'
+os.environ['LD_LIBRARY_PATH'] = '/usr/local/cuda/lib64'
+import subprocess
 from tqdm import tqdm
 from pathlib import Path
 from time import time, sleep
@@ -53,6 +57,32 @@ def plot_reconstruction(rec_gt, name='Reconstruction.html'):
     fig = viz_3d.init_figure()
     viz_3d.plot_reconstruction(fig, rec_gt, cameras=False, color='rgba(255,50,255, 0.5)', name="Ground Truth", cs=5)
     fig.write_html(name)
+
+def run_colmap_command(command):
+    """ Utility function to run a COLMAP command. """
+    try:
+        output = subprocess.run(command, shell=True, check=True, text=True, capture_output=True)
+        print(output.stdout)
+    except subprocess.CalledProcessError as e:
+        print("Error running command:", command)
+        print(e.output)
+
+def colmap_dense_reconstruction(image_path, sparse_model_path, output_path):
+    # Image Undistortion
+    dense_path = os.path.join(output_path, 'dense')
+    os.makedirs(dense_path, exist_ok=True)
+    run_colmap_command(f"colmap image_undistorter --image_path '{image_path}' --input_path '{sparse_model_path}' --output_path '{dense_path}' --output_type COLMAP --max_image_size 2000")
+
+    # Dense Reconstruction
+    run_colmap_command(f"colmap patch_match_stereo --workspace_path '{dense_path}' --workspace_format COLMAP --PatchMatchStereo.geom_consistency true")
+
+    # Stereo Fusion
+    fused_ply_path = os.path.join(dense_path, 'fused.ply')
+    run_colmap_command(f"colmap stereo_fusion --workspace_path '{dense_path}' --workspace_format COLMAP --input_type geometric --output_path '{fused_ply_path}'")
+
+    print("Dense reconstruction completed. Output stored at:", fused_ply_path)
+
+
 
 device = K.utils.get_cuda_device_if_available(0)
 print(device)
