@@ -18,9 +18,6 @@ cp aliked_lightglue.pth ~/.cache/torch/hub/checkpoints/aliked_lightglue_v0-1_arx
 echo "Downloading and extracting ALIKED model checkpoints..."
 kaggle models instances versions download oldufo/aliked/pyTorch/aliked-n16/1
 tar -xzf aliked.tar.gz
-# git clone --recursive https://github.com/cvg/Hierarchical-Localization/
-# cd Hierarchical-Localization/
-# python3 -m pip install -e .
 cp aliked-n16.pth ~/.cache/torch/hub/checkpoints/aliked-n16.pth
 
 # Download and extract DinoV2 model checkpoints

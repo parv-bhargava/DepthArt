@@ -7,10 +7,10 @@ from scripts.utils import *
 DEBUG = True
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Path and image settings
-feature_dir = Path("/home/ubuntu/DepthArt/features/")
-images_list = list(Path("/home/ubuntu/DepthArt/train/haiper/bike/images").glob("*.jpeg"))[:10]
-index_pairs = get_image_pairs(images_list, "/home/ubuntu/DepthArt/dinov2/pytorch/base/1")
+# # Path and image settings
+# feature_dir = Path("/home/ubuntu/DepthArt/features/")
+# images_list = list(Path("/home/ubuntu/DepthArt/train/haiper/bike/images").glob("*.jpeg"))[:10]
+# index_pairs = get_image_pairs(images_list, "/home/ubuntu/DepthArt/dinov2/pytorch/base/1")
 
 def visualize_matches(paths, idx1, idx2, feature_dir):
     # Load images
@@ -88,8 +88,8 @@ def visualize_matches(paths, idx1, idx2, feature_dir):
 
 
 # Example usage within your debug condition
-if DEBUG:
-    idx1,idx2= index_pairs[2]
-
-    visualize_matches(images_list, idx1,idx2, feature_dir)
+# if DEBUG:
+#     idx1,idx2= index_pairs[2]
+#
+#     visualize_matches(images_list, idx1,idx2, feature_dir)
 

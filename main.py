@@ -8,7 +8,7 @@ from scripts.match import visualize_matches
 from scripts.ransac import import_into_colmap
 from scripts.utils import plot_reconstruction
 
-PATH = '/home/ubuntu/DepthArt/train/phototourism/lincoln_memorial_statue/images'
+PATH = '/home/ubuntu/DepthArt/train/phototourism/colosseum_exterior/images'
 EXT = 'jpg'
 PATH_FEATURES = '/home/ubuntu/DepthArt/features'
 DINO_PATH = '/home/ubuntu/DepthArt/dinov2/pytorch/base/1'
@@ -30,7 +30,7 @@ idx1, idx2 = index_pairs[2]
 visualize_matches(images_list, idx1, idx2, feature_dir)
 
 # Import into Colmap
-database_path = "colmap.db"
+database_path = "colmap_colosseum.db"
 images_dir = images_list[0].parent
 import_into_colmap(
     images_dir,
@@ -54,4 +54,6 @@ maps = pycolmap.incremental_mapping(
 )
 
 # Visualize the 3D reconstruction
-plot_reconstruction(maps[0], 'Reconstruction_Lincon.html')
+plot_reconstruction(maps[0], 'Reconstruction_Colosseum_0.html')
+plot_reconstruction(maps[1], 'Reconstruction_Colosseum_1.html')
+
