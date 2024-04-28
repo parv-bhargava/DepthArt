@@ -27,7 +27,7 @@ cp aliked-n16.pth ~/.cache/torch/hub/checkpoints/aliked-n16.pth
 echo "Downloading and extracting DinoV2 model checkpoints..."
 kaggle models instances versions download metaresearch/dinov2/pyTorch/base/1
 mkdir -p dinov2/pytorch/base/1
-tar -xzf base.tar.gz -C dinov2/pytorch/base/1
+tar -xzf dinov2.tar.gz -C dinov2/pytorch/base/1
 
 #Setting up 3d-viz library hloc
 echo "Setting up hloc..."
