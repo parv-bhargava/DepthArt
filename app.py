@@ -10,7 +10,8 @@ from scripts.image_pair import get_image_pairs
 from scripts.ransac import import_into_colmap
 import pycolmap
 from scripts.utils import plot_reconstruction
-
+from scripts.test import points
+import io
 PATH_FEATURES = '/home/ubuntu/DepthArt/features'
 DINO_PATH = '/home/ubuntu/DepthArt/dinov2/pytorch/base/1'
 feature_dir = Path(PATH_FEATURES)
@@ -42,13 +43,15 @@ def handle_dataset_choice():
 
     if select_action == "Custom Dataset":
         dataset_option = st.selectbox("Select a dataset",
-                                      ["British Museum", "Colosseum", "Lincoln Memorial", "Taj Mahal", "Nara Temple"])
+                                      ["British Museum", "Colosseum", "Lincoln Memorial", "Taj Mahal", "Nara Temple","Fountains","Kyiv Theater"])
         dataset_path_info = {
             "British Museum": ("phototourism", "british_museum"),
             "Colosseum": ("phototourism", "colosseum_exterior"),
             "Lincoln Memorial": ("phototourism", "lincoln_memorial_statue"),
             "Taj Mahal": ("phototourism", "taj_mahal"),
-            "Nara Temple": ("phototourism", "temple_nara_japan")
+            "Nara Temple": ("phototourism", "temple_nara_japan"),
+            "Fountains": ("haiper","fountain"),
+            "Kyiv Theater":("urban","kyiv-puppet-theater")
 
         }
         dataset, scene = dataset_path_info[dataset_option]
@@ -57,8 +60,9 @@ def handle_dataset_choice():
         images_list = [Path(image) for image in
                        sorted(list(path.glob('*.jpg'))) + sorted(list(path.glob('*.jpeg'))) + sorted(
                            list(path.glob('*.png')))]
-        st.write(images_list)
-        st.write(path)
+        # st.write(images_list)
+        # st.write(path)
+        st.success(f"Files loaded successfully")
         st.session_state['images_list'] = images_list
         st.session_state['scene'] = scene
         st.session_state['dataset'] = dataset
@@ -85,8 +89,8 @@ def handle_dataset_choice():
                            sorted(directory_path.glob(ext))]
             st.success(f"Files uploaded and saved successfully")
 
-            st.write(directory_path)
-            st.write(images_list)  # Display paths of all images in the directory
+            # st.write(directory_path)
+            # st.write(images_list)  # Display paths of all images in the directory
             st.session_state['images_list'] = images_list
             st.session_state['scene'] = scene
             st.session_state['dataset'] = dataset
@@ -96,7 +100,7 @@ def handle_dataset_choice():
 def visualize_images():
     st.title("Let's Visualize")
     if 'scene' in st.session_state:
-        st.write(f"Selected Scene: {st.session_state['scene']}")
+        st.subheader(f"Selected Scene: {st.session_state['scene']}")
 
     if 'images_list' in st.session_state and st.session_state['images_list']:
         image_paths = st.session_state['images_list']
@@ -114,7 +118,7 @@ def visualize_images():
 def extract():
     st.title("Extracting Keypoints ...")
     if 'scene' in st.session_state:
-        st.write(f"Selected Scene: {st.session_state['scene']}")
+        st.subheader(f"Selected Scene: {st.session_state['scene']}")
 
     if 'images_list' in st.session_state and st.session_state['images_list']:
         images_list = st.session_state['images_list']
@@ -122,6 +126,7 @@ def extract():
         # Assuming detect_keypoints function is defined to handle the list of images and save keypoints
         detect_keypoints(images_list, feature_dir, device=device)
         st.success("Keypoints detected and saved.")
+        points(images_list)
     else:
         st.error("No images to display")
 
@@ -130,7 +135,7 @@ def image_match():
     st.title("Matching Images...")
 
     if 'scene' in st.session_state:
-        st.write(f"Selected Scene: {st.session_state['scene']}")
+        st.subheader(f"Selected Scene: {st.session_state['scene']}")
 
     if 'images_list' in st.session_state and st.session_state['images_list']:
         images_list = st.session_state['images_list'][:10]
@@ -144,13 +149,22 @@ def image_match():
 
         # Visualize the first pair for example
         if index_pairs:
-            idx1, idx2 = index_pairs[0]
-            visualize_matches(images_list, idx1, idx2, feature_dir)
 
+            # Let user select which pair to visualize
+            try:
+                selected_pair_index = st.selectbox("Select Image Pair to Visualize:", range(len(index_pairs)),
+                                                   format_func=lambda x: index_pairs[x])
+                idx1, idx2 = index_pairs[selected_pair_index]
+                visualize_matches(images_list, idx1, idx2, feature_dir)
+            except IndexError as e:
+                st.error(f"Selected index out of range: {e}")
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
         else:
-            st.error("No pairs to display.")
-    else:
-        st.error("No images to display.")
+            st.warning("No pairs to display. Ensure there are at least two images with detectable features.")
+
+
+
 
 
 def perform_reconstruction(scene):
@@ -185,6 +199,14 @@ def perform_reconstruction(scene):
         html_data = f.read()
 
     st.components.v1.html(html_data, height=800)
+    # Download
+
+    st.download_button(
+        label="Download HTML",
+        data=html_data,
+        file_name=f"Reconstruction_{scene}.html",
+        mime="text/html"
+    )
 
 
 def handle_reconstruction():
@@ -200,8 +222,17 @@ def handle_reconstruction():
             html_file_path = f"/home/ubuntu/DepthArt/3D_sparse_reconstructions/Reconstruction_{st.session_state['scene']}.html"
             html_file = Path(html_file_path)
             if html_file.is_file():
-                html_content = html_file.read_text(encoding='utf-8')
-                st.components.v1.html(html_content, height=800, scrolling=True)
+                html_data = html_file.read_text(encoding='utf-8')
+                st.components.v1.html(html_data, height=800, scrolling=True)
+                # Download
+
+                st.download_button(
+                    label="Download HTML",
+                    data=html_data,
+                    file_name=f"Reconstruction_{st.session_state['scene']}.html",
+                    mime="text/html"
+
+                )
             else:
                 st.error("HTML file does not exist for the selected scene.")
     else:
@@ -209,9 +240,10 @@ def handle_reconstruction():
 
 
 def main():
-    st.sidebar.title("What to do:")
+
+    st.sidebar.title("Navigation")
     app_mode = st.sidebar.radio("Go to", ["Introduction", "Literature Review", "Choose Dataset", "Visualize Images",
-                                          "Extracting Keypoints", "Matching Images", "Sparse Reconstruction"])
+                                          "Extract Keypoints", "Match Images", "Sparse Reconstruction"])
 
     if app_mode == "Introduction":
         st.title("Image Matching and 3D Reconstruction")
@@ -221,9 +253,9 @@ def main():
         handle_dataset_choice()
     elif app_mode == "Visualize Images":
         visualize_images()
-    elif app_mode == "Extracting Keypoints":
+    elif app_mode == "Extract Keypoints":
         extract()
-    elif app_mode == "Matching Images":
+    elif app_mode == "Match Images":
         image_match()
     elif app_mode == "Sparse Reconstruction":
         handle_reconstruction()
