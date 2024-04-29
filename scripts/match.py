@@ -33,6 +33,13 @@ def visualize_matches(paths, idx1, idx2, feature_dir):
         add = (img2.shape[0] - img1.shape[0])
         pad = np.zeros((add, img1.shape[1], 3))
         img1 = np.append(img1, pad, axis=0)
+    # Check the heights of the images
+    # Determine the maximum height among both images
+    # max_height = max(img1.shape[0], img2.shape[0])
+    #
+    # # Resize both images to have the same height
+    # img1 = cv2.resize(img1, (int(img1.shape[1] * max_height / img1.shape[0]), max_height))
+    # img2 = cv2.resize(img2, (int(img2.shape[1] * max_height / img2.shape[0]), max_height))
 
     combined_image = np.hstack((img1, img2))
 
