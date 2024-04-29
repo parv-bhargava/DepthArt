@@ -2,7 +2,7 @@ from matplotlib.patches import Circle, ConnectionPatch
 import matplotlib as mpl
 from scripts.image_pair import get_image_pairs
 from scripts.utils import *
-
+import streamlit as st
 # Constants and Configuration
 DEBUG = True
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -62,9 +62,11 @@ def visualize_matches(paths, idx1, idx2, feature_dir):
             if paths[idx1].name in f_matches and paths[idx2].name in f_matches[paths[idx1].name]:
                 matches = np.array(f_matches[paths[idx1].name][paths[idx2].name])
             else:
+                st.write("No matches found.")
                 print("No matches found.")
                 return
     except IOError as e:
+        st.write(f"Error opening feature files: {e}")
         print(f"Error opening feature files: {e}")
         return
 
@@ -80,7 +82,7 @@ def visualize_matches(paths, idx1, idx2, feature_dir):
     colormaps = mpl.colormaps['tab20c']
     norm = mpl.colors.Normalize(vmin=0, vmax=(len(matches) - 1))
 
-    for i, match in enumerate(matches):
+    for i, match in enumerate(matches[:20]):
         point1 = keypoints1[match[0]]
         point2 = keypoints2[match[1]] + np.array([width, 0])  # Adjust point2's x-coordinate
 
@@ -93,6 +95,7 @@ def visualize_matches(paths, idx1, idx2, feature_dir):
         ax.add_patch(circle2)
         ax.add_artist(line)
 
+    st.pyplot(fig)
     plt.show()
 
 
