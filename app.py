@@ -11,9 +11,14 @@ from scripts.ransac import import_into_colmap
 import pycolmap
 from scripts.utils import plot_reconstruction
 from scripts.test import points
-import io
-PATH_FEATURES = '/home/ubuntu/DepthArt/features'
-DINO_PATH = '/home/ubuntu/DepthArt/dinov2/pytorch/base/1'
+
+# Current working directory
+base_dir = os.getcwd()
+
+# Join the current directory with the relative paths
+PATH_FEATURES = os.path.join(base_dir, 'features')
+DINO_PATH = os.path.join(base_dir, 'Dinov2', 'pytorch', 'base', '1')
+
 feature_dir = Path(PATH_FEATURES)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 EXT = ['jpeg', 'jpg', 'png']
@@ -66,7 +71,7 @@ def save_uploaded_file(uploaded_file, base_path, dataset, scene):
 def handle_dataset_choice():
     st.header("Choose Dataset")
     select_action = st.selectbox("Select function", ["Choose", "Custom Dataset", "Upload Dataset"])
-    base_path = '/home/ubuntu/DepthArt/train'
+    base_path = os.path.join(base_dir, 'train')
     images_list = []
     # Local scope for image list handling
 
@@ -195,15 +200,28 @@ def image_match():
         st.error("No images to display")
 
 
-
-
 def perform_reconstruction(scene):
     if 'images_list' not in st.session_state or not st.session_state['images_list']:
         st.error("Image list is not available.")
         return
+
+
     images_list = st.session_state['images_list']
-    database_path = f"colmap_{scene}.db"
-    images_dir = images_list[0].parent
+    # Assuming base_dir is defined somewhere above this function or you should define it here
+    base_dir = Path.cwd()
+
+    database_path = base_dir / f'colmap_{scene}.db'
+
+    images_dir = images_list[0].parent if images_list else None
+    if not images_list:
+        st.error("No images available for processing.")
+        return
+
+    # Ensure database path does not exist before continuing
+    if database_path.exists():
+        database_path.unlink()
+        st.success(f"Existing database {database_path} removed successfully.")
+
     import_into_colmap(
         images_dir,
         feature_dir,
@@ -211,7 +229,7 @@ def perform_reconstruction(scene):
     )
     pycolmap.match_exhaustive(database_path)
 
-    # This does the reconstruction
+    # Reconstruction process
     mapper_options = pycolmap.IncrementalPipelineOptions()
     mapper_options.min_model_size = 3
     mapper_options.max_num_models = 2
@@ -219,38 +237,51 @@ def perform_reconstruction(scene):
     maps = pycolmap.incremental_mapping(
         database_path=database_path,
         image_path=images_dir,
-        output_path=Path.cwd() / "incremental_pipeline_outputs",
+        output_path=base_dir / "incremental_pipeline_outputs",
         options=mapper_options,
     )
-    # Visualize the 3D reconstruction
+
+    # Check if any maps were created
+    if not maps:
+        st.error("No reconstruction maps were generated. Check input data and parameters.")
+        return
+
+    # If maps are available, proceed with visualization and further processing
     plot_reconstruction(maps[0], f'Reconstruction_{scene}.html')
-    path_to_html = Path(f'/home/ubuntu/DepthArt/Reconstruction_{scene}.html')
-    with open(path_to_html, 'r') as f:
-        html_data = f.read()
+    path_to_html = base_dir / f'Reconstruction_{scene}.html'
 
-    st.components.v1.html(html_data, height=800)
-    # Download
+    if path_to_html.exists():
+        with open(path_to_html, 'r') as f:
+            html_data = f.read()
 
-    st.download_button(
-        label="Download HTML",
-        data=html_data,
-        file_name=f"Reconstruction_{scene}.html",
-        mime="text/html"
-    )
+        st.components.v1.html(html_data, height=800)
+        st.download_button(
+            label="Download HTML",
+            data=html_data,
+            file_name=f"Reconstruction_{scene}.html",
+            mime="text/html"
+        )
 
 
 def handle_reconstruction():
     st.header("Reconstructing...")
 
+
+
+
     if 'scene' in st.session_state and 'dataset' in st.session_state:
+        st.subheader(f"Selected Scene: {st.session_state['scene']}")
+        scene = st.session_state['scene']
         if st.session_state['dataset'] == 'upload':
             # Call the function to perform reconstruction
             perform_reconstruction(st.session_state['scene'])
         elif st.session_state['dataset'] != 'upload':
             # Show the HTML file related to the custom dataset
 
-            html_file_path = f"/home/ubuntu/DepthArt/3D_sparse_reconstructions/Reconstruction_{st.session_state['scene']}.html"
+            html_file_path = os.path.join(base_dir, '3D_sparse_reconstructions',
+                                          f'Reconstruction_{scene}.html')
             html_file = Path(html_file_path)
+
             if html_file.is_file():
                 html_data = html_file.read_text(encoding='utf-8')
                 st.components.v1.html(html_data, height=800, scrolling=True)
