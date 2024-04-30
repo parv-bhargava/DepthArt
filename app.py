@@ -301,6 +301,14 @@ def handle_reconstruction():
 
 def further_scope():
     st.header("Further Scope")
+    dense_reconstruction_text = """
+     #### Dense Reconstruction
+    Dense reconstruction refers to the process of creating detailed, high-resolution 3D models from sets of images. Unlike Structure from Motion (SfM) that primarily produces sparse point clouds by identifying and matching keypoints across images, dense reconstruction techniques fill in the gaps, offering a comprehensive 3D representation of the photographed scene.
+
+    This technique often utilizes methods such as Multi-View Stereo (MVS) to analyze the multiple images of a scene and reconstruct a dense mesh by considering a wider array of visible points. This not only improves the visual quality and usability of the reconstructed models for applications in virtual reality and augmented reality but also enhances the accuracy of environmental simulations and urban planning tools. The advent of deep learning has further pushed the boundaries of what's achievable with dense reconstruction, enabling more nuanced understanding and interaction with the physical world through digital twins.
+        """
+
+    st.markdown(dense_reconstruction_text)
 
 def references():
     st.header("References")
