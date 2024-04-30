@@ -262,7 +262,7 @@ def handle_reconstruction():
         elif st.session_state['dataset'] != 'upload':
             # Show the HTML file related to the custom dataset
 
-            html_file_path = os.path.join(base_dir, '3D_sparse_reconstructions',
+            html_file_path = os.path.join(base_dir, 'assets',
                                           f'Reconstruction_{scene}.html')
             html_file = Path(html_file_path)
 
