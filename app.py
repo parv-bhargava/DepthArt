@@ -19,6 +19,35 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 EXT = ['jpeg', 'jpg', 'png']
 images_list = []
 
+def literature_review():
+    st.header("Literature Review")
+    select_action = st.selectbox("Understanding the Models", ["Choose", "Dinov2", "ALIKED","LightGLUE"])
+    if select_action=="Dinov2":
+        st.subheader("Dino")
+    elif select_action =="ALIKED":
+        st.subheader("ALIKED")
+    elif select_action=="LightGLUE":
+        st.subheader("LightGLUE")
+
+def show_introduction():
+    st.header("Image Matching and 3D Reconstruction")
+    introduction_markdown = """
+    #### Context
+    The most accessible camera today is often the smartphone. When individuals capture and share photos of landmarks, these images represent limited two-dimensional perspectives. Structure from Motion (SfM) leverages these diverse snapshots to reconstruct three-dimensional models, enhancing our visual interaction with the world through advanced machine learning techniques.
+
+    #### Technical Background
+    Structure from Motion reconstructs 3D structures from sequences of 2D images, typically enhanced by motion sensors. While high-quality datasets are usually obtained under controlled conditions, creating 3D models from varied unstructured images introduces complexities due to inconsistent lighting, weather, and differing viewpoints.
+
+    #### Problem Selection and Justification
+    We focus on image matching to reconstruct 3D images from 2D photos, driven by its relevance to augmented reality, urban planning, and navigation systems. This challenge is central to computer vision, enabling machines to interpret visual environments in a human-like manner.
+
+    #### Dataset Overview
+    Our project employs a robust dataset designed for image matching technology benchmarking. This dataset features a wide range of images from various environments, ideal for developing and refining deep learning models to efficiently perform image matching.
+        """
+
+
+    st.markdown(introduction_markdown)
+
 
 def save_uploaded_file(uploaded_file, base_path, dataset, scene):
     # Construct the directory path
@@ -35,7 +64,7 @@ def save_uploaded_file(uploaded_file, base_path, dataset, scene):
 
 
 def handle_dataset_choice():
-    st.title("Choose Dataset")
+    st.header("Choose Dataset")
     select_action = st.selectbox("Select function", ["Choose", "Custom Dataset", "Upload Dataset"])
     base_path = '/home/ubuntu/DepthArt/train'
     images_list = []
@@ -98,7 +127,7 @@ def handle_dataset_choice():
 
 
 def visualize_images():
-    st.title("Let's Visualize")
+    st.header("Let's Visualize")
     if 'scene' in st.session_state:
         st.subheader(f"Selected Scene: {st.session_state['scene']}")
 
@@ -116,7 +145,7 @@ def visualize_images():
 
 
 def extract():
-    st.title("Extracting Keypoints ...")
+    st.header("Extracting Keypoints ...")
     if 'scene' in st.session_state:
         st.subheader(f"Selected Scene: {st.session_state['scene']}")
 
@@ -132,7 +161,7 @@ def extract():
 
 
 def image_match():
-    st.title("Matching Images...")
+    st.header("Matching Images...")
 
     if 'scene' in st.session_state:
         st.subheader(f"Selected Scene: {st.session_state['scene']}")
@@ -162,7 +191,8 @@ def image_match():
                 st.error(f"An error occurred: {e}")
         else:
             st.warning("No pairs to display. Ensure there are at least two images with detectable features.")
-
+    else:
+        st.error("No images to display")
 
 
 
@@ -210,7 +240,7 @@ def perform_reconstruction(scene):
 
 
 def handle_reconstruction():
-    st.title("Reconstructing...")
+    st.header("Reconstructing...")
 
     if 'scene' in st.session_state and 'dataset' in st.session_state:
         if st.session_state['dataset'] == 'upload':
@@ -238,17 +268,21 @@ def handle_reconstruction():
     else:
         st.error("No dataset selected or scene information is missing.")
 
+def further_scope():
+    st.header("Further Scope")
 
+def references():
+    st.header("References")
 def main():
 
     st.sidebar.title("Navigation")
     app_mode = st.sidebar.radio("Go to", ["Introduction", "Literature Review", "Choose Dataset", "Visualize Images",
-                                          "Extract Keypoints", "Match Images", "Sparse Reconstruction"])
+                                          "Extract Keypoints", "Match Images", "Sparse Reconstruction","Further Scope","References"])
 
     if app_mode == "Introduction":
-        st.title("Image Matching and 3D Reconstruction")
+        show_introduction()
     elif app_mode == "Literature Review":
-        st.title("Literature Review")
+        literature_review()
     elif app_mode == "Choose Dataset":
         handle_dataset_choice()
     elif app_mode == "Visualize Images":
@@ -259,6 +293,10 @@ def main():
         image_match()
     elif app_mode == "Sparse Reconstruction":
         handle_reconstruction()
+    elif app_mode == "Further Scope":
+        further_scope()
+    elif app_mode == "References":
+        references()
 
     # Implement other app modes as needed
 
