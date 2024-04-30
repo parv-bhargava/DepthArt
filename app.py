@@ -1,16 +1,19 @@
-import streamlit as st
-from pathlib import Path
 import os
-from PIL import Image
-import torch
-from scripts.extract_keypoint import detect_keypoints
-from scripts.match import visualize_matches
-from scripts.keypoint_distance import keypoint_distances
-from scripts.image_pair import get_image_pairs
-from scripts.ransac import import_into_colmap
+from pathlib import Path
+
 import pycolmap
-from scripts.utils import plot_reconstruction
+import streamlit as st
+import torch
+from PIL import Image
+
+from scripts.content import *
+from scripts.extract_keypoint import detect_keypoints
+from scripts.image_pair import get_image_pairs
+from scripts.keypoint_distance import keypoint_distances
+from scripts.match import visualize_matches
+from scripts.ransac import import_into_colmap
 from scripts.test import points
+from scripts.utils import plot_reconstruction
 
 # Current working directory
 base_dir = os.getcwd()
@@ -24,33 +27,21 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 EXT = ['jpeg', 'jpg', 'png']
 images_list = []
 
+
 def literature_review():
     st.header("Literature Review")
-    select_action = st.selectbox("Understanding the Models", ["Choose", "Dinov2", "ALIKED","LightGLUE"])
-    if select_action=="Dinov2":
+    select_action = st.selectbox("Understanding the Models", ["Choose", "Dinov2", "ALIKED", "LightGLUE"])
+    if select_action == "Dinov2":
         st.subheader("Dino")
-    elif select_action =="ALIKED":
+    elif select_action == "ALIKED":
         st.subheader("ALIKED")
-    elif select_action=="LightGLUE":
+    elif select_action == "LightGLUE":
         st.subheader("LightGLUE")
 
+
 def show_introduction():
-    st.header("Image Matching and 3D Reconstruction")
-    introduction_markdown = """
-    #### Context
-    The most accessible camera today is often the smartphone. When individuals capture and share photos of landmarks, these images represent limited two-dimensional perspectives. Structure from Motion (SfM) leverages these diverse snapshots to reconstruct three-dimensional models, enhancing our visual interaction with the world through advanced machine learning techniques.
-
-    #### Technical Background
-    Structure from Motion reconstructs 3D structures from sequences of 2D images, typically enhanced by motion sensors. While high-quality datasets are usually obtained under controlled conditions, creating 3D models from varied unstructured images introduces complexities due to inconsistent lighting, weather, and differing viewpoints.
-
-    #### Problem Selection and Justification
-    We focus on image matching to reconstruct 3D images from 2D photos, driven by its relevance to augmented reality, urban planning, and navigation systems. This challenge is central to computer vision, enabling machines to interpret visual environments in a human-like manner.
-
-    #### Dataset Overview
-    Our project employs a robust dataset designed for image matching technology benchmarking. This dataset features a wide range of images from various environments, ideal for developing and refining deep learning models to efficiently perform image matching.
-        """
-
-
+    st.header(HEADER)
+    introduction_markdown = INTRODUCTION
     st.markdown(introduction_markdown)
 
 
@@ -76,18 +67,8 @@ def handle_dataset_choice():
     # Local scope for image list handling
 
     if select_action == "Custom Dataset":
-        dataset_option = st.selectbox("Select a dataset",
-                                      ["British Museum", "Colosseum", "Lincoln Memorial", "Taj Mahal", "Nara Temple","Fountains","Kyiv Theater"])
-        dataset_path_info = {
-            "British Museum": ("phototourism", "british_museum"),
-            "Colosseum": ("phototourism", "colosseum_exterior"),
-            "Lincoln Memorial": ("phototourism", "lincoln_memorial_statue"),
-            "Taj Mahal": ("phototourism", "taj_mahal"),
-            "Nara Temple": ("phototourism", "temple_nara_japan"),
-            "Fountains": ("haiper","fountain"),
-            "Kyiv Theater":("urban","kyiv-puppet-theater")
-
-        }
+        dataset_option = st.selectbox("Select a dataset",LIST_DATASETS)
+        dataset_path_info = DATASET_PATH_INFO
         dataset, scene = dataset_path_info[dataset_option]
         path = Path(f'{base_path}/{dataset}/{scene}/images')
         # images_list = sorted(list(path.glob('*.jpg')) + list(path.glob('*.jpeg')) + list(path.glob('*.png')))
@@ -205,7 +186,6 @@ def perform_reconstruction(scene):
         st.error("Image list is not available.")
         return
 
-
     images_list = st.session_state['images_list']
     # Assuming base_dir is defined somewhere above this function or you should define it here
     base_dir = Path.cwd()
@@ -266,9 +246,6 @@ def perform_reconstruction(scene):
 def handle_reconstruction():
     st.header("Reconstructing...")
 
-
-
-
     if 'scene' in st.session_state and 'dataset' in st.session_state:
         st.subheader(f"Selected Scene: {st.session_state['scene']}")
         scene = st.session_state['scene']
@@ -299,25 +276,21 @@ def handle_reconstruction():
     else:
         st.error("No dataset selected or scene information is missing.")
 
+
 def further_scope():
     st.header("Further Scope")
-    dense_reconstruction_text = """
-     #### Dense Reconstruction
-    Dense reconstruction refers to the process of creating detailed, high-resolution 3D models from sets of images. Unlike Structure from Motion (SfM) that primarily produces sparse point clouds by identifying and matching keypoints across images, dense reconstruction techniques fill in the gaps, offering a comprehensive 3D representation of the photographed scene.
-
-    This technique often utilizes methods such as Multi-View Stereo (MVS) to analyze the multiple images of a scene and reconstruct a dense mesh by considering a wider array of visible points. This not only improves the visual quality and usability of the reconstructed models for applications in virtual reality and augmented reality but also enhances the accuracy of environmental simulations and urban planning tools. The advent of deep learning has further pushed the boundaries of what's achievable with dense reconstruction, enabling more nuanced understanding and interaction with the physical world through digital twins.
-        """
+    dense_reconstruction_text = DENSE_RECONSTRUCTION
 
     st.markdown(dense_reconstruction_text)
 
+
 def references():
     st.header("References")
+
+
 def main():
-
     st.sidebar.title("Navigation")
-    app_mode = st.sidebar.radio("Go to", ["Introduction", "Literature Review", "Choose Dataset", "Visualize Images",
-                                          "Extract Keypoints", "Match Images", "Sparse Reconstruction","Further Scope","References"])
-
+    app_mode = st.sidebar.radio("Go to", GOTO)
     if app_mode == "Introduction":
         show_introduction()
     elif app_mode == "Literature Review":
@@ -342,4 +315,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
