@@ -128,7 +128,8 @@ def handle_dataset_choice():
             st.session_state['images_list'] = images_list
             st.session_state['scene'] = scene
             st.session_state['dataset'] = dataset
-            st.session_state['path'] = directory_path  # store directory path
+            st.session_state['path'] = directory_path
+            st.session_state['extract']='extract'# store directory path
 
 
 def visualize_images():
@@ -163,37 +164,40 @@ def extract():
         points(images_list)
     else:
         st.error("No images to display")
-
+    st.session_state['match'] = 'match'
 
 def image_match():
     st.header("Matching Images...")
+    if 'match' not in st.session_state:
+        st.error("Extract Keypoints first")
 
-    if 'scene' in st.session_state:
+    elif 'scene' in st.session_state:
         st.subheader(f"Selected Scene: {st.session_state['scene']}")
 
-    if 'images_list' in st.session_state and st.session_state['images_list']:
-        images_list = st.session_state['images_list'][:10]
-        feature_dir = Path(PATH_FEATURES)
+        if 'images_list' in st.session_state and st.session_state['images_list']:
+            images_list = st.session_state['images_list'][:10]
+            feature_dir = Path(PATH_FEATURES)
 
-        # Get image pairs
-        index_pairs = get_image_pairs(images_list, DINO_PATH)
+            # Get image pairs
+            index_pairs = get_image_pairs(images_list, DINO_PATH)
 
-        # Compute Keypoint Distances
-        keypoint_distances(images_list, index_pairs, feature_dir, verbose=False, device=device)
+            # Compute Keypoint Distances
+            keypoint_distances(images_list, index_pairs, feature_dir, verbose=False, device=device)
 
-        # Visualize the first pair for example
-        if index_pairs:
+            # Visualize the first pair for example
+            if index_pairs:
 
-            # Let user select which pair to visualize
-            try:
-                selected_pair_index = st.selectbox("Select Image Pair to Visualize:", range(len(index_pairs)),
-                                                   format_func=lambda x: index_pairs[x])
-                idx1, idx2 = index_pairs[selected_pair_index]
-                visualize_matches(images_list, idx1, idx2, feature_dir)
-            except IndexError as e:
-                st.error(f"Selected index out of range: {e}")
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
+                # Let user select which pair to visualize
+                try:
+                    selected_pair_index = st.selectbox("Select Image Pair to Visualize:", range(len(index_pairs)),
+                                                       format_func=lambda x: index_pairs[x])
+                    idx1, idx2 = index_pairs[selected_pair_index]
+                    visualize_matches(images_list, idx1, idx2, feature_dir)
+                    st.session_state['sparse'] = 'sparse'
+                except IndexError as e:
+                    st.error(f"Selected index out of range: {e}")
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
         else:
             st.warning("No pairs to display. Ensure there are at least two images with detectable features.")
     else:
@@ -266,10 +270,11 @@ def perform_reconstruction(scene):
 def handle_reconstruction():
     st.header("Reconstructing...")
 
+    if 'match' not in st.session_state or 'sparse' not in st.session_state:
+        st.error("Extract Keypoints and Match Images first")
 
 
-
-    if 'scene' in st.session_state and 'dataset' in st.session_state:
+    elif 'scene' in st.session_state and 'dataset' in st.session_state:
         st.subheader(f"Selected Scene: {st.session_state['scene']}")
         scene = st.session_state['scene']
         if st.session_state['dataset'] == 'upload':
@@ -342,4 +347,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
