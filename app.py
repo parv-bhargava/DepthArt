@@ -32,11 +32,38 @@ def model_explanation():
     st.header("Model Explanation")
     select_action = st.selectbox("Understanding the Models", ["Choose", "Dinov2", "ALIKED", "LightGLUE"])
     if select_action == "Dinov2":
-        st.subheader("Dino")
+
+        dinotext= DINO
+        st.markdown(dinotext)
+        # dino_pca = os.path.join(base_dir, 'Architecture',
+        #                               'Dino_pca.png')
+        # # Display an image
+        # st.image(dino_pca, caption="PCA Color Coded Patches")
+        st.markdown(dinobody)
     elif select_action == "ALIKED":
-        st.subheader("ALIKED")
+        alikedtext1=alikedheader
+        st.markdown(alikedtext1)
+        deform_cnn = os.path.join(base_dir, 'Architecture',
+                                      'deformable_convolution.png')
+        # Display an image
+        st.image(deform_cnn, caption="Deformable Convolution")
+        alikedtext2=alikedintro
+        st.markdown(alikedtext2)
+        arch= os.path.join(base_dir, 'Architecture',
+                                  'ALIKED_architecture.png')
+        st.image(arch, caption="ALIKED Architecture")
+        alikedtext3 = alikedbody
+        st.markdown(alikedtext3)
+        sddh= os.path.join(base_dir, 'Architecture',
+                                  'SDDH.png')
+        st.image(sddh, caption="SDDH")
+        alikedtext4 = alikedconclusion
+        st.markdown(alikedtext4)
+
     elif select_action == "LightGLUE":
         st.subheader("LightGLUE")
+        light=light_glue
+        st.markdown(light)
 
 def show_introduction():
     st.header(HEADER)
@@ -309,7 +336,7 @@ def main():
         visualize_images()
     elif app_mode == "Extract Keypoints":
         extract()
-    elif app_mode == "Match Images":
+    elif app_mode == "Match Keypoints":
         image_match()
     elif app_mode == "Sparse Reconstruction":
         handle_reconstruction()

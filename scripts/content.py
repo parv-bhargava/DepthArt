@@ -34,5 +34,119 @@ LIST_DATASETS = ["British Museum", "Colosseum", "Lincoln Memorial", "Taj Mahal",
                  "Fountains", "Kyiv Theater"]
 
 GOTO = ["Introduction", "Model Explanation", "Choose Dataset", "Visualize Images",
-        "Extract Keypoints", "Match Images", "Sparse Reconstruction", "Further Scope",
+        "Extract Keypoints", "Match Keypoints", "Sparse Reconstruction", "Further Scope",
         "References"]
+
+DINO="""
+#### DINOv2: Learning Robust Visual Features through Vision Transformers
+It is based on a self-supervised learning approach which means it needs no labels. It learns directly from the image. Thus, can capture better features.
+
+**DINOv2’s Vision Transformer Architecture**
+
+1.	The input image is first divided into fixed-size patches, which are then linearly embedded. Positional encodings are added to these embeddings to preserve information about the relative positions of the patches.
+
+2.	The embeddings pass through multiple layers of the transformer encoder, each consisting of multi-headed self-attention and position-wise fully connected layers.
+
+3.	DINO uses a teacher-student setup where both models are identical in architecture but differ in their parameter update dynamics. The student model tries to predict the output of the teacher. 
+"""
+dinobody="""
+#### **How Image Matching Works?**
+
+1. Extract dense embeddings from images using the pretrained Vision Transformer.
+
+2. Feature Normalization: To ensure embeddings have consistent scale, crucial for reliable similarity measurements.
+
+3. Efficient Pairwise Distances: Calculating distances between embeddings, facilitating the identification of similar images.
+
+4. Select image pairs based on a similarity threshold.
+
+"""
+
+alikedheader="""
+#### ALIKED: A Lighter Keypoint and Descriptor Extraction Network via Deformable Transformation
+
+**Deformable Convolution** – A modified convolution that adds 2D offsets to the regular grid sampling locations of a standard convolution.
+"""
+alikedintro="""
+The 2D convolution consists of two steps: 
+
+1.	sampling using a regular grid over the input feature map
+2.	Summation of sampled values weighted by W.
+
+In deformable convolution the regular grid is augmented with offsets.
+
+**Why deformable convolutions?**
+"""
+alikedbody="""
+Traditionally, DNNs were used to extract descriptors of image patches at predefined keypoints. The conventional convolution operations lack to provide the geometric invariance required for the descriptor. The deformable convolutional network can model any geometric transformation by adjusting the offset for each pixel in the convolution.
+ALIKED used a Sparse Deformable Descriptor Head (SDDH) to learn deformable positions of supporting features for each keypoint and constructs deformable descriptors.
+
+"""
+alikedconclusion="""
+The input image I is initially encoded into multi-scale features {F1,F2,F3,F4} with encoding block1 to block4, and the number of channels of Fi is ci. Then, the multi-scale features are aggregated with upsample blocks (ublock4 to ublock1), and the output features Fui are concatenated to obtain the final image feature F. The Score Map Head (SMH) extracts the score map S with F followed by a Differentiable Keypoint Detection (DKD) module [10] to detect the keypoints p1 p2. The SDDH then efficiently extracts deformable invariant descriptors at the detected keypoints. “BN”, “poolingN”, and “DCN3x3” denote batch normalization, NxN average pooling, and 3x3 deformable convolution, respectively.
+The SDDH estimates M deformable sample positions on KxK keypoint feature patches (K=5 in this example), samples M supporting features on the feature map based on the deformable sample positions, encodes the supporting features, and aggregates them with convM for descriptor extraction.
+
+"""
+light_glue="""
+### 1. Input
+
+The model begins by receiving inputs consisting of two sets of local features from two images (referred to as image A and image B). Each local feature in these sets comprises:
+- **2D point location** (`p_i`): The coordinates (x, y) of the feature in its respective image, normalized by the image dimensions to fall between 0 and 1. (The keypoints)
+- **Visual descriptor** (`d_i`): A high-dimensional vector extracted using a feature detector and descriptor (ALIKED in our case), which encodes the appearance around the feature point, allowing for a robust comparison across different views.(The descriptors)
+
+### 2. Initial State Setting
+
+Each feature's visual descriptor initializes its corresponding state vector in the model. This state vector (`x_i`) is what the Transformer architecture will manipulate through its layers to refine and compare feature information between the two images.
+
+### 3. Transformer Backbone
+
+This is where the primary computation of LightGlue occurs, involving layers of self-attention and cross-attention:
+
+#### **Self-Attention Mechanism**
+
+- **Goal**: To refine each feature's representation by aggregating contextual information from all other features within the same image.
+- **Operation**:
+  - Each feature generates **query (q)** and **key (k)** vectors through trainable transformations of its state vector.
+  - The attention scores between all pairs of features within the image are calculated based on the dot product of queries and keys.
+  - The feature states are updated by aggregating (via a weighted sum) the states of all other features in the image, weighted by the softmax-normalized attention scores.
+
+#### **Cross-Attention Mechanism**
+
+- **Goal**: To enhance the feature states by incorporating relevant information from corresponding features in the opposite image, essentially aligning features across images.
+- **Operation**:
+  - Each feature in image A generates a key, and each feature in image B uses these keys to calculate cross-image attention scores, and vice versa.
+  - Similar to self-attention, the states are updated based on these cross-attention scores, allowing features in one image to pull information from the other.
+
+### 4. Adaptive Mechanisms
+
+To enhance efficiency, LightGlue employs adaptive depth and point pruning strategies:
+
+#### **Adaptive Depth**
+- **Concept**: The model assesses at each layer if further processing is necessary by evaluating a confidence measure.
+- **Implementation**: A classifier predicts the confidence level of the current matches, and if it exceeds a predefined threshold, the model terminates early.
+
+#### **Point Pruning**
+- **Concept**: During processing, points determined as confidently unmatched or unmatchable are removed from subsequent calculations.
+- **Implementation**: This reduces the computational load, especially in deeper layers, by focusing only on features still under consideration.
+
+### 5. Correspondence Prediction and Output
+
+After the Transformer layers process the features:
+
+#### **Assignment Scores**
+- **Calculation**: The model computes a pairwise score for each pair of features across the two images, based on the similarity of their updated state vectors.
+
+#### **Matchability Scores**
+- **Calculation**: Each feature receives a score indicating its likelihood of having a match in the opposite image, which is used to weigh the pairwise scores.
+
+### 6. Output - Partial Assignment Matrix
+
+The final output is a soft partial assignment matrix, where each element represents the probability of a feature in image A matching with a feature in image B. High values in this matrix indicate likely matches, from which correspondences are selected.
+
+### 7. Supervision and Training
+
+- **Training**: The model is optimized using a loss function that combines the likelihoods of correct and incorrect matches, adjusting the model parameters to reduce mismatches.
+- **Data**: Trained on a mix of synthetic data for robustness and real-world images for practical applicability.
+
+This comprehensive structure allows LightGlue not just to match features but to do so in a way that is both computationally efficient and highly adaptive to the complexity of the matching scenario.
+"""
