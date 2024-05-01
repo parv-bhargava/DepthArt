@@ -62,14 +62,29 @@ def model_explanation():
 
     elif select_action == "LightGLUE":
         st.subheader("LightGLUE")
+        lightglue = os.path.join(base_dir, 'Architecture',
+                                 'LightGlue.png')
+        # Display an image
+        st.image(lightglue, caption="LightGLUE Architecture")
         light=light_glue
         st.markdown(light)
+        prune = os.path.join(base_dir, 'Architecture',
+                                 'pruning.png')
+        # Display an image
+        st.image(prune, caption="Pruning")
+        st.markdown(lightbody)
+
 
 def show_introduction():
     st.header(HEADER)
     introduction_markdown = INTRODUCTION
     st.markdown(introduction_markdown)
-
+def process():
+    st.header("Process Flow")
+    flow = os.path.join(base_dir, 'Architecture',
+                              'flow.png')
+    # Display an image
+    st.image(flow, caption="Process Flow")
 
 def save_uploaded_file(uploaded_file, base_path, dataset, scene):
     # Construct the directory path
@@ -174,7 +189,7 @@ def extract():
     st.session_state['match'] = 'match'
 
 def image_match():
-    st.header("Matching Images...")
+    st.header("Matching Keypoints...")
     if 'match' not in st.session_state:
         st.error("Extract Keypoints first")
 
@@ -210,7 +225,13 @@ def image_match():
     else:
         st.error("No images to display")
 
-
+def to_3d():
+    st.header("Going from 2D to 3D")
+    tri = os.path.join(base_dir, 'Architecture',
+                             'TriangulationIdeal.svg.png')
+    # Display an image
+    st.image(tri, caption="Triangulation")
+    st.markdown(triangulation)
 def perform_reconstruction(scene):
     if 'images_list' not in st.session_state or not st.session_state['images_list']:
         st.error("Image list is not available.")
@@ -273,6 +294,7 @@ def perform_reconstruction(scene):
         )
 
 
+
 def handle_reconstruction():
     st.header("Reconstructing...")
 
@@ -320,6 +342,7 @@ def further_scope():
 
 def references():
     st.header("References")
+    st.markdown(reference)
 
 
 def main():
@@ -328,6 +351,8 @@ def main():
     app_mode = st.sidebar.radio("Go to", GOTO)
     if app_mode == "Introduction":
         show_introduction()
+    elif app_mode=="Process Flow":
+        process()
     elif app_mode == "Model Explanation":
         model_explanation()
     elif app_mode == "Choose Dataset":
@@ -338,6 +363,8 @@ def main():
         extract()
     elif app_mode == "Match Keypoints":
         image_match()
+    elif app_mode =="From 2D to 3D":
+        to_3d()
     elif app_mode == "Sparse Reconstruction":
         handle_reconstruction()
     elif app_mode == "Further Scope":
