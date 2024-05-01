@@ -1,14 +1,15 @@
 from pathlib import Path
 import pycolmap
+import pandas as pd
 import torch
 from scripts.extract_keypoint import detect_keypoints
 from scripts.image_pair import get_image_pairs
 from scripts.keypoint_distance import keypoint_distances
 from scripts.match import visualize_matches
 from scripts.ransac import import_into_colmap
-from scripts.utils import plot_reconstruction,colmap_dense_reconstruction
+from scripts.utils import plot_reconstruction,colmap_dense_reconstruction,save_rot_tra_info
 
-PATH = '/home/ubuntu/DepthArt/train/phototourism/taj_mahal/images'
+PATH = '/home/ubuntu/DepthArt/saj'
 EXT = 'jpg'
 PATH_FEATURES = '/home/ubuntu/DepthArt/features'
 DINO_PATH = '/home/ubuntu/DepthArt/dinov2/pytorch/base/1'
@@ -32,7 +33,7 @@ visualize_matches(images_list, idx1, idx2, feature_dir)
 
 
 # Import into Colmap
-database_path = "colmap_taj.db"
+database_path = "colmap_saj.db"
 images_dir = images_list[0].parent
 import_into_colmap(
     images_dir,
@@ -55,8 +56,11 @@ maps = pycolmap.incremental_mapping(
     options=mapper_options,
 )
 
+# Save rotational matrix and translation info into a csv file
+save_rot_tra_info(maps, 'rot_tra_info.csv')
+
 # Visualize the 3D reconstruction
-plot_reconstruction(maps[0], 'Reconstruction_Colosseum_0.html')
+# plot_reconstruction(maps[0], 'Reconstructionsaj.html')
 
 
 # Dense Reconstruction

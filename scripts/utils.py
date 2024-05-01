@@ -83,6 +83,18 @@ def colmap_dense_reconstruction(image_path, sparse_model_path, output_path):
     print("Dense reconstruction completed. Output stored at:", fused_ply_path)
 
 
+def save_rot_tra_info(maps, filename):
+    data = []
+    for k, im in maps[0].images.items():
+        rotation_matrix = im.cam_from_world.rotation.matrix()
+        translation = im.cam_from_world.translation
+        data.append({
+            "Image ID": k,
+            "Rotation Matrix": rotation_matrix,
+            "Translation": translation
+        })
+    df = pd.DataFrame(data)
+    df.to_csv(filename, index=False)
 
 device = K.utils.get_cuda_device_if_available(0)
 print(device)
