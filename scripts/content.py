@@ -33,6 +33,6 @@ DATASET_PATH_INFO = {
 LIST_DATASETS = ["British Museum", "Colosseum", "Lincoln Memorial", "Taj Mahal", "Nara Temple",
                  "Fountains", "Kyiv Theater"]
 
-GOTO = ["Introduction", "Literature Review", "Choose Dataset", "Visualize Images",
+GOTO = ["Introduction", "Model Explanation", "Choose Dataset", "Visualize Images",
         "Extract Keypoints", "Match Images", "Sparse Reconstruction", "Further Scope",
         "References"]

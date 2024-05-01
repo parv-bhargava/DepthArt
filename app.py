@@ -28,8 +28,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 EXT = ['jpeg', 'jpg', 'png']
 images_list = []
 
-def literature_review():
-    st.header("Literature Review")
+def model_explanation():
+    st.header("Model Explanation")
     select_action = st.selectbox("Understanding the Models", ["Choose", "Dinov2", "ALIKED", "LightGLUE"])
     if select_action == "Dinov2":
         st.subheader("Dino")
@@ -301,8 +301,8 @@ def main():
     app_mode = st.sidebar.radio("Go to", GOTO)
     if app_mode == "Introduction":
         show_introduction()
-    elif app_mode == "Literature Review":
-        literature_review()
+    elif app_mode == "Model Explanation":
+        model_explanation()
     elif app_mode == "Choose Dataset":
         handle_dataset_choice()
     elif app_mode == "Visualize Images":
