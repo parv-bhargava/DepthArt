@@ -19,10 +19,4 @@ To obtain a solid background in applying deep learning to image matching, We wil
 **Performance Metrics:**
 The network's performance will be judged based on Mean Average Accuracy (mAA). 
 
-**Schedule:**
-March 25th - April 1st  : Problem selection
-April 2nd - April 10th  : Understanding the nuances, Research Ideas, reading of papers and different ways of implementation
-April 11th - April 21st : Code Implementation
-April 22nd - April 26th : Streamlit and finalizing
-
 ---
